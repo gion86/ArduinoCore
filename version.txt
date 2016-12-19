@@ -1,0 +1,9 @@
+Arduino core v1.6.13
+
+Compiled from https://github.com/arduino/Arduino/tree/master/hardware/arduino/avr/cores/arduino 
+
+Checkout with:
+# svn checkout https://github.com/arduino/Arduino/trunk/hardware/arduino/avr/cores/arduino
+
+SVN revision 11873
+Github commit  24cba16 on 12 Sep @Ivan-Perez Ivan-Perez Spaces to tab
