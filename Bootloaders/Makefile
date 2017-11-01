@@ -179,7 +179,7 @@ atmega88_isp: isp
 
 # ATmega328 @8MHz
 #
-atmega328_8Mhz: TARGET = atmega328_pro_8MHz
+atmega328_8Mhz: TARGET = atmega328_8MHz
 atmega328_8Mhz: MCU_TARGET = atmega328p
 atmega328_8Mhz: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
 atmega328_8Mhz: AVR_FREQ = 8000000L
@@ -188,7 +188,7 @@ atmega328_8Mhz: $(PROGRAM)_atmega328_8MHz.hex
 atmega328_8Mhz: $(PROGRAM)_atmega328_8MHz.lst
 
 atmega328_8Mhz_isp: atmega328_8Mhz
-atmega328_8Mhz_isp: TARGET = atmega328_pro_8MHz
+atmega328_8Mhz_isp: TARGET = atmega328_8MHz
 atmega328_8Mhz_isp: MCU_TARGET = atmega328p
 # 512 byte boot, SPIEN
 atmega328_8Mhz_isp: HFUSE = DF
@@ -203,6 +203,28 @@ atmega328_8Mhz_isp: isp
 #
 # These are capable of 9600 baud
 #
+
+# ATmega328 @1MHz
+#
+atmega328_1Mhz: TARGET = atmega328_1MHz
+atmega328_1Mhz: MCU_TARGET = atmega328p
+atmega328_1Mhz: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=9600'
+atmega328_1Mhz: AVR_FREQ = 1000000L
+atmega328_1Mhz: LDSECTIONS = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
+atmega328_1Mhz: $(PROGRAM)_atmega328_1MHz.hex
+atmega328_1Mhz: $(PROGRAM)_atmega328_1MHz.lst
+
+atmega328_1Mhz_isp: atmega328_1Mhz
+atmega328_1Mhz_isp: TARGET = atmega328_1MHz
+atmega328_1Mhz_isp: MCU_TARGET = atmega328p
+# 512 byte boot, SPIEN
+atmega328_1Mhz_isp: HFUSE = DF
+# Internal RC oscillator (1MHz)
+atmega328_1Mhz_isp: LFUSE = 62
+# 2.7V brownout
+atmega328_1Mhz_isp: EFUSE = FF
+atmega328_1Mhz_isp: isp
+
 
 #
 # Generic build instructions
