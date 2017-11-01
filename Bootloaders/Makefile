@@ -4,6 +4,7 @@
 #
 # - removed unused platforms
 # - changed programmer to usbasp
+# - added target for 328P @8MHz and @1MHz
 # Gionata Boccalini, 01.11.2017 
 
 #
@@ -23,23 +24,15 @@
 PROGRAM    = optiboot
 
 # The default behavior is to build using tools that are in the users
-# current path variables, but we can also build using an installed
-# Arduino user IDE setup, or the Arduino source tree.
-# Uncomment this next lines to build within the arduino environment,
-# using the arduino-included avrgcc toolset (mac and pc)
-# ENV ?= arduino
-# ENV ?= arduinodev
-# OS ?= macosx
-# OS ?= windows
+# current path variables.
 
-
-# enter the parameters for the avrdude isp tool
+# Enter the parameters for the avrdude isp tool
 ISPTOOL	   = usbasp
 ISPPORT	   = 
 ISPSPEED   = 
 
 MCU_TARGET = atmega328
-LDSECTIONS  = -Wl,--section-start=.text=0x3e00 -Wl,--section-start=.version=0x3ffe
+LDSECTIONS = -Wl,--section-start=.text=0x3e00 -Wl,--section-start=.version=0x3ffe
 
 # Build environments
 # Start of some ugly makefile-isms to allow optiboot to be built
@@ -60,16 +53,16 @@ AVRDUDE_CONF = -C/etc/avrdude/avrdude.conf
 # lock it), but since the high two bits of the lock byte are
 # unused, avrdude would get confused.
 
-ISPFUSES    = $(GCCROOT)avrdude $(AVRDUDE_CONF) -c $(ISPTOOL) \
-              -p $(MCU_TARGET) -P $(ISPPORT) $(ISPSPEED) \
-              -e -u -U lock:w:0x3f:m -U efuse:w:0x$(EFUSE):m \
-              -U hfuse:w:0x$(HFUSE):m -U lfuse:w:0x$(LFUSE):m
-ISPFLASH    = $(GCCROOT)avrdude $(AVRDUDE_CONF) -c $(ISPTOOL) \
-              -p $(MCU_TARGET) -P $(ISPPORT) $(ISPSPEED) \
-              -U flash:w:$(PROGRAM)_$(TARGET).hex -U lock:w:0x0f:m
+ISPFUSES   = $(GCCROOT)avrdude $(AVRDUDE_CONF) -c $(ISPTOOL) \
+             -p $(MCU_TARGET) -P $(ISPPORT) $(ISPSPEED) \
+             -e -u -U lock:w:0x3f:m -U efuse:w:0x$(EFUSE):m \
+             -U hfuse:w:0x$(HFUSE):m -U lfuse:w:0x$(LFUSE):m
+ISPFLASH   = $(GCCROOT)avrdude $(AVRDUDE_CONF) -c $(ISPTOOL) \
+             -p $(MCU_TARGET) -P $(ISPPORT) $(ISPSPEED) \
+             -U flash:w:$(PROGRAM)_$(TARGET).hex -U lock:w:0x0f:m
 
 OBJ        = $(PROGRAM).o
-OPTIMIZE = -Os -fno-inline-small-functions -fno-split-wide-types #-mshort-calls
+OPTIMIZE   = -Os -fno-inline-small-functions -fno-split-wide-types #-mshort-calls
 
 DEFS       = 
 LIBS       =
@@ -78,13 +71,13 @@ CC         = $(GCCROOT)avr-gcc
 
 # Override is only needed by avr-lib build system.
 
-override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) -DF_CPU=$(AVR_FREQ) $(DEFS)
-override LDFLAGS       = $(LDSECTIONS) -Wl,--relax -Wl,--gc-sections -nostartfiles -nostdlib
+override CFLAGS  = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) -DF_CPU=$(AVR_FREQ) $(DEFS)
+override LDFLAGS = $(LDSECTIONS) -Wl,--relax -Wl,--gc-sections -nostartfiles -nostdlib
 
-OBJCOPY        = $(GCCROOT)avr-objcopy
-OBJDUMP        = $(call fixpath,$(GCCROOT)avr-objdump)
+OBJCOPY    = $(GCCROOT)avr-objcopy
+OBJDUMP    = $(call fixpath,$(GCCROOT)avr-objdump)
 
-SIZE           = $(GCCROOT)avr-size
+SIZE       = $(GCCROOT)avr-size
 
 # 20MHz clocked platforms
 #
