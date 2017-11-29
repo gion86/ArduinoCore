@@ -28,7 +28,7 @@ PROGRAM    = optiboot
 
 # Enter the parameters for the avrdude isp tool
 ISPTOOL	   = usbasp
-ISPPORT	   = 
+ISPPORT	   = usb
 ISPSPEED   = 
 
 MCU_TARGET = atmega328
