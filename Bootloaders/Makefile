@@ -26,12 +26,19 @@ PROGRAM    = optiboot
 # The default behavior is to build using tools that are in the users
 # current path variables.
 
-# Enter the parameters for the avrdude isp tool
-ISPTOOL	   = usbasp
-ISPPORT	   = usb
+# Enter the parameters for the avrdude isp tool:
+
+# USBasp configuration
+#ISPTOOL	= usbasp
+#ISPPORT	= usb
+#ISPSPEED   = 
+
+# Pololu configuration
+ISPTOOL	   = stk500v2
+ISPPORT	   = /dev/ttyACM0
 ISPSPEED   = 
 
-MCU_TARGET = atmega328
+MCU_TARGET = atmega328p
 LDSECTIONS = -Wl,--section-start=.text=0x3e00 -Wl,--section-start=.version=0x3ffe
 
 # Build environments
@@ -55,11 +62,11 @@ AVRDUDE_CONF = -C/etc/avrdude/avrdude.conf
 
 ISPFUSES   = $(GCCROOT)avrdude $(AVRDUDE_CONF) -c $(ISPTOOL) \
              -p $(MCU_TARGET) -P $(ISPPORT) $(ISPSPEED) \
-             -e -u -U lock:w:0x3f:m -U efuse:w:0x$(EFUSE):m \
+             -e -u -U lock:w:0xff:m -U efuse:w:0x$(EFUSE):m \
              -U hfuse:w:0x$(HFUSE):m -U lfuse:w:0x$(LFUSE):m
 ISPFLASH   = $(GCCROOT)avrdude $(AVRDUDE_CONF) -c $(ISPTOOL) \
              -p $(MCU_TARGET) -P $(ISPPORT) $(ISPSPEED) \
-             -U flash:w:$(PROGRAM)_$(TARGET).hex -U lock:w:0x0f:m
+             -U flash:w:$(PROGRAM)_$(TARGET).hex -U lock:w:0xcf:m
 
 OBJ        = $(PROGRAM).o
 OPTIMIZE   = -Os -fno-inline-small-functions -fno-split-wide-types #-mshort-calls
@@ -103,26 +110,26 @@ atmega168_isp: LFUSE = FF
 atmega168_isp: EFUSE = 04
 atmega168_isp: isp
 
-# ATmega328
+# ATmega328p
 #
-atmega328: TARGET = atmega328
-atmega328: MCU_TARGET = atmega328p
-atmega328: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
-atmega328: AVR_FREQ = 16000000L
-atmega328: LDSECTIONS  = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
-atmega328: $(PROGRAM)_atmega328.hex
-atmega328: $(PROGRAM)_atmega328.lst
+atmega328p: TARGET = atmega328p
+atmega328p: MCU_TARGET = atmega328p
+atmega328p: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
+atmega328p: AVR_FREQ = 16000000L
+atmega328p: LDSECTIONS  = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
+atmega328p: $(PROGRAM)_atmega328p.hex
+atmega328p: $(PROGRAM)_atmega328p.lst
 
-atmega328_isp: atmega328
-atmega328_isp: TARGET = atmega328
-atmega328_isp: MCU_TARGET = atmega328p
+atmega328p_isp: atmega328p
+atmega328p_isp: TARGET = atmega328
+atmega328p_isp: MCU_TARGET = atmega328p
 # 512 byte boot, SPIEN
-atmega328_isp: HFUSE = DE
+atmega328p_isp: HFUSE = DE
 # Low power xtal (16MHz) 16KCK/14CK+65ms
-atmega328_isp: LFUSE = FF
+atmega328p_isp: LFUSE = FF
 # 2.7V brownout
-atmega328_isp: EFUSE = FD
-atmega328_isp: isp
+atmega328p_isp: EFUSE = FD
+atmega328p_isp: isp
 
 # ATmega8
 #
@@ -170,10 +177,32 @@ atmega88_isp: isp
 # These are capable of 115200 baud
 #
 
+# ATmega328p @8MHz
+#
+atmega328p_8Mhz: TARGET = atmega328p_8MHz
+atmega328p_8Mhz: MCU_TARGET = atmega328p
+atmega328p_8Mhz: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
+atmega328p_8Mhz: AVR_FREQ = 8000000L
+atmega328p_8Mhz: LDSECTIONS = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
+atmega328p_8Mhz: $(PROGRAM)_atmega328p_8MHz.hex
+atmega328p_8Mhz: $(PROGRAM)_atmega328p_8MHz.lst
+
+atmega328p_8Mhz_isp: atmega328p_8Mhz
+atmega328p_8Mhz_isp: TARGET = atmega328_8MHz
+atmega328p_8Mhz_isp: MCU_TARGET = atmega328p
+# 512 byte boot, SPIEN
+atmega328p_8Mhz_isp: HFUSE = DF
+# Internal RC oscillator (8MHz)
+atmega328p_8Mhz_isp: LFUSE = E2
+# 2.7V brownout
+atmega328p_8Mhz_isp: EFUSE = FF
+atmega328p_8Mhz_isp: isp
+
+
 # ATmega328 @8MHz
 #
 atmega328_8Mhz: TARGET = atmega328_8MHz
-atmega328_8Mhz: MCU_TARGET = atmega328p
+atmega328_8Mhz: MCU_TARGET = atmega328
 atmega328_8Mhz: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
 atmega328_8Mhz: AVR_FREQ = 8000000L
 atmega328_8Mhz: LDSECTIONS = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
@@ -182,7 +211,7 @@ atmega328_8Mhz: $(PROGRAM)_atmega328_8MHz.lst
 
 atmega328_8Mhz_isp: atmega328_8Mhz
 atmega328_8Mhz_isp: TARGET = atmega328_8MHz
-atmega328_8Mhz_isp: MCU_TARGET = atmega328p
+atmega328_8Mhz_isp: MCU_TARGET = atmega328
 # 512 byte boot, SPIEN
 atmega328_8Mhz_isp: HFUSE = DF
 # Internal RC oscillator (8MHz)
@@ -191,16 +220,37 @@ atmega328_8Mhz_isp: LFUSE = E2
 atmega328_8Mhz_isp: EFUSE = FF
 atmega328_8Mhz_isp: isp
 
-
 # 1MHz clocked platforms
 #
 # These are capable of 9600 baud
 #
 
+# ATmega328p @1MHz
+#
+atmega328p_1Mhz: TARGET = atmega328p_1MHz
+atmega328p_1Mhz: MCU_TARGET = atmega328p
+atmega328p_1Mhz: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=9600'
+atmega328p_1Mhz: AVR_FREQ = 1000000L
+atmega328p_1Mhz: LDSECTIONS = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
+atmega328p_1Mhz: $(PROGRAM)_atmega328p_1MHz.hex
+atmega328p_1Mhz: $(PROGRAM)_atmega328p_1MHz.lst
+
+atmega328p_1Mhz_isp: atmega328p_1Mhz
+atmega328p_1Mhz_isp: TARGET = atmega328_1MHz
+atmega328p_1Mhz_isp: MCU_TARGET = atmega328p
+# 512 byte boot, SPIEN
+atmega328p_1Mhz_isp: HFUSE = DF
+# Internal RC oscillator (1MHz)
+atmega328p_1Mhz_isp: LFUSE = 62
+# 2.7V brownout
+atmega328p_1Mhz_isp: EFUSE = FF
+atmega328p_1Mhz_isp: isp
+
+
 # ATmega328 @1MHz
 #
 atmega328_1Mhz: TARGET = atmega328_1MHz
-atmega328_1Mhz: MCU_TARGET = atmega328p
+atmega328_1Mhz: MCU_TARGET = atmega328
 atmega328_1Mhz: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=9600'
 atmega328_1Mhz: AVR_FREQ = 1000000L
 atmega328_1Mhz: LDSECTIONS = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
@@ -209,7 +259,7 @@ atmega328_1Mhz: $(PROGRAM)_atmega328_1MHz.lst
 
 atmega328_1Mhz_isp: atmega328_1Mhz
 atmega328_1Mhz_isp: TARGET = atmega328_1MHz
-atmega328_1Mhz_isp: MCU_TARGET = atmega328p
+atmega328_1Mhz_isp: MCU_TARGET = atmega328
 # 512 byte boot, SPIEN
 atmega328_1Mhz_isp: HFUSE = DF
 # Internal RC oscillator (1MHz)
@@ -217,7 +267,6 @@ atmega328_1Mhz_isp: LFUSE = 62
 # 2.7V brownout
 atmega328_1Mhz_isp: EFUSE = FF
 atmega328_1Mhz_isp: isp
-
 
 #
 # Generic build instructions
