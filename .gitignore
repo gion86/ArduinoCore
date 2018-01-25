@@ -1,4 +1,2 @@
-/Arduino_Uno/
-/Atmega328P/
-/ATMega328P/
 *.lst
+/ATMega328P_8Mhz/
