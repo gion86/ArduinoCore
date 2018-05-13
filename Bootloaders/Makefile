@@ -86,7 +86,7 @@ OBJDUMP    = $(call fixpath,$(GCCROOT)avr-objdump)
 
 SIZE       = $(GCCROOT)avr-size
 
-# 20MHz clocked platforms
+# 20MHz - 16Mhz clocked platforms
 #
 # These are capable of 230400 baud, or 115200 baud on PC (Arduino Avrdude issue)
 #
@@ -130,6 +130,27 @@ atmega328p_isp: LFUSE = FF
 # 2.7V brownout
 atmega328p_isp: EFUSE = FD
 atmega328p_isp: isp
+
+# ATmega328
+#
+atmega328: TARGET = atmega328
+atmega328: MCU_TARGET = atmega328
+atmega328: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
+atmega328: AVR_FREQ = 16000000L
+atmega328: LDSECTIONS  = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
+atmega328: $(PROGRAM)_atmega328.hex
+atmega328: $(PROGRAM)_atmega328.lst
+
+atmega328_isp: atmega328
+atmega328_isp: TARGET = atmega328
+atmega328_isp: MCU_TARGET = atmega328
+# 512 byte boot, SPIEN
+atmega328_isp: HFUSE = DE
+# Low power xtal (16MHz) 16KCK/14CK+65ms
+atmega328_isp: LFUSE = FF
+# 2.7V brownout
+atmega328_isp: EFUSE = FD
+atmega328_isp: isp
 
 # ATmega8
 #
