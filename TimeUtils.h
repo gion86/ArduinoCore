@@ -110,4 +110,27 @@ static time_t makeTime(int16_t YYYY, int8_t MM, int8_t DD, int8_t hh, int8_t mm,
   return mk_gmtime(&tm);
 }
 
+/*
+ * Converts the date/time to standard Unix epoch format, using time.h library (avr-libc).
+ * Fills the struct tm parameter.
+ *
+ * Param:
+ * - int16_t YYYY: year (given as ex. 2017)
+ * - int8_t MM: month [1, 12]
+ * - int8_t DD: day of the month [1, 31]
+ * - int8_t hh: hour [0, 23]
+ * - int8_t mm: minute [0, 59]
+ * - int8_t ss: second [0, 59]
+ */
+static void makeTime(struct tm *tm, int16_t YYYY, int8_t MM, int8_t DD, int8_t hh, int8_t mm, int8_t ss) {
+  memset((void*) tm, 0, sizeof(*tm));
+
+  tm->tm_year = YYYY - 1900;         // avr-libc time.h: years since 1900
+  tm->tm_mon  = MM - 1;              // avr-libc time.h: months in [0, 11]
+  tm->tm_mday = DD;
+  tm->tm_hour = hh;
+  tm->tm_min  = mm;
+  tm->tm_sec  = ss;
+}
+
 #endif /* TIMEUTILS_H_ */
