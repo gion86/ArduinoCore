@@ -22,6 +22,17 @@
 
 #include <Arduino.h>
 
+// MACRO to manipulate dates for avr-libc time.h (years since 1900,
+// months in [0, 11]
+#define  TM_YEAR_CAL(Y) ((Y) + 1900)  // Full four digit year
+#define  CAL_YEAR_TM(Y) ((Y) - 1900)
+
+#define  TM_YEAR_Y2K(Y) ((Y) - 100)   // Two digit year
+#define  Y2K_YEAR_TM(Y) ((Y) + 100)
+
+#define  TM_MON_CAL(M)  ((M) + 1)     // Two digit month
+#define  CAL_MON_TM(M)  ((M) - 1)
+
 // ########################################################
 // Time manipulation functions
 // ########################################################
@@ -54,18 +65,15 @@ static void printTime(struct tm *tm, const char *tz = NULL) {
   Serial.print(' ');
   Serial.print(tm->tm_mday);
   Serial.print('/');
-  Serial.print(tm->tm_mon + 1);              // avr-libc time.h: months in [0, 11]
+  Serial.print(TM_MON_CAL(tm->tm_mon));      // avr-libc time.h: months in [0, 11]
   Serial.print('/');
-  Serial.print(tm->tm_year + 1900);          // avr-libc time.h: years since 1900
-
+  Serial.print(TM_YEAR_CAL(tm->tm_year));    // avr-libc time.h: years since 1900
   Serial.print(' ');
   Serial.print(tm->tm_wday);
-
   if (tz != NULL) {
     Serial.print(' ');
     Serial.print(tz);
   }
-
   Serial.println();
 }
 
@@ -101,8 +109,8 @@ static time_t makeTime(int16_t YYYY, int8_t MM, int8_t DD, int8_t hh, int8_t mm,
 
   memset((void*) &tm, 0, sizeof(tm));
 
-  tm.tm_year = YYYY - 1900;         // avr-libc time.h: years since 1900
-  tm.tm_mon  = MM - 1;              // avr-libc time.h: months in [0, 11]
+  tm.tm_year = CAL_YEAR_TM(YYYY);   // avr-libc time.h: years since 1900
+  tm.tm_mon  = CAL_MON_TM(MM);      // avr-libc time.h: months in [0, 11]
   tm.tm_mday = DD;
   tm.tm_hour = hh;
   tm.tm_min  = mm;
@@ -125,12 +133,14 @@ static time_t makeTime(int16_t YYYY, int8_t MM, int8_t DD, int8_t hh, int8_t mm,
 static void makeTime(struct tm *tm, int16_t YYYY, int8_t MM, int8_t DD, int8_t hh, int8_t mm, int8_t ss) {
   memset((void*) tm, 0, sizeof(*tm));
 
-  tm->tm_year = YYYY - 1900;         // avr-libc time.h: years since 1900
-  tm->tm_mon  = MM - 1;              // avr-libc time.h: months in [0, 11]
+  tm->tm_year = CAL_YEAR_TM(YYYY);  // avr-libc time.h: years since 1900
+  tm->tm_mon  = CAL_MON_TM(MM);     // avr-libc time.h: months in [0, 11]
   tm->tm_mday = DD;
   tm->tm_hour = hh;
   tm->tm_min  = mm;
   tm->tm_sec  = ss;
+
+  // TODO set weekday!!!!!
 }
 
 #endif /* TIMEUTILS_H_ */
