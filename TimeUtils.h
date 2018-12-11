@@ -43,10 +43,22 @@
  * Param:
  * - int digits
  */
-static void inline printDigits(int digits) {
-  if (digits < 10)
+static void inline printDigits(int d) {
+  if (d >= 0 && d < 10)
     Serial.print('0');
-  Serial.print(digits);
+  Serial.print(d);
+}
+
+/*
+ * Write to serial a digit with zero padding if needed.
+ *
+ * Param:
+ * - float n
+ */
+static void inline printDigits(float f) {
+  if (f >= 0.0 && f < 10.0)
+    Serial.print('0');
+  Serial.print(f);
 }
 
 /*
@@ -56,7 +68,7 @@ static void inline printDigits(int digits) {
  * - struct tm  *tm: struct tm from the time.h (avr-libc)
  * - const char *tz: string for the timezone, if not used set to NULL
  */
-static void printTime(struct tm *tm, const char *tz = NULL) {
+static void printTime(struct tm *tm, const char *tz = NULL, const bool newl = true) {
   printDigits(tm->tm_hour);
   Serial.print(':');
   printDigits(tm->tm_min);
@@ -74,7 +86,9 @@ static void printTime(struct tm *tm, const char *tz = NULL) {
     Serial.print(' ');
     Serial.print(tz);
   }
-  Serial.println();
+  if (newl) {
+    Serial.println();
+  }
 }
 
 /*
@@ -84,13 +98,13 @@ static void printTime(struct tm *tm, const char *tz = NULL) {
  * - time_t time: time from the time.h (avr-libc)
  * - const char *tz: string for the timezone, if not used set to NULL
  */
-static void printTime(time_t time, const char *tz = NULL) {
+static void printTime(time_t time, const char *tz = NULL, const bool newl = true) {
   struct tm tm;
 
   memset((void*) &tm, 0, sizeof(tm));
   gmtime_r(&time, &tm);
 
-  printTime(&tm, tz);
+  printTime(&tm, tz, newl);
 }
 
 /*
