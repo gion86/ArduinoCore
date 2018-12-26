@@ -134,9 +134,10 @@ static time_t makeTime(int16_t YYYY, int8_t MM, int8_t DD, int8_t hh, int8_t mm,
 
 /*
  * Converts the date/time to standard Unix epoch format, using time.h library (avr-libc).
- * Fills the struct tm parameter.
+ * Fills the tm struct parameter.
  *
  * Param:
+ * - struct tm *tm: pointer to the tm structure to be filled
  * - int16_t YYYY: year (given as ex. 2017)
  * - int8_t MM: month [1, 12]
  * - int8_t DD: day of the month [1, 31]
@@ -144,7 +145,7 @@ static time_t makeTime(int16_t YYYY, int8_t MM, int8_t DD, int8_t hh, int8_t mm,
  * - int8_t mm: minute [0, 59]
  * - int8_t ss: second [0, 59]
  */
-static void makeTime(struct tm *tm, int16_t YYYY, int8_t MM, int8_t DD, int8_t hh, int8_t mm, int8_t ss) {
+static time_t makeTime(struct tm *tm, int16_t YYYY, int8_t MM, int8_t DD, int8_t hh, int8_t mm, int8_t ss) {
   memset((void*) tm, 0, sizeof(*tm));
 
   tm->tm_year = CAL_YEAR_TM(YYYY);  // avr-libc time.h: years since 1900
@@ -154,7 +155,8 @@ static void makeTime(struct tm *tm, int16_t YYYY, int8_t MM, int8_t DD, int8_t h
   tm->tm_min  = mm;
   tm->tm_sec  = ss;
 
-  // TODO set weekday!!!!!
+  // Set weekday and yearday
+  return mktime(tm);
 }
 
 #endif /* TIMEUTILS_H_ */
